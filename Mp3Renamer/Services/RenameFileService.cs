@@ -1,6 +1,7 @@
 ﻿using Mp3Renamer.Extensions;
 using System;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using Mp3Renamer.Interfaces;
 using File = TagLib.File;
 
@@ -8,6 +9,13 @@ namespace Mp3Renamer.Services
 {
     public class RenameFileService : IRenameFileService
     {
+        private readonly ILogger<RenameFileService> _logger;
+
+        public RenameFileService(ILogger<RenameFileService> logger)
+        {
+            _logger = logger;
+        }
+
         public void RenameFile(string pathToFile)
         {
             try
@@ -28,7 +36,7 @@ namespace Mp3Renamer.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex.ToString());
             }
         }
     }

@@ -4,6 +4,7 @@ using Mp3Renamer.Strategy;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace Mp3Renamer
 {
@@ -11,31 +12,47 @@ namespace Mp3Renamer
     {
         private readonly ITimerService<IEnumerable<string>> _timerService;
         private readonly IRenameFileService _renameFileService;
+        private readonly ILogger<AppRunner> _logger;
 
         public AppRunner(
             ITimerService<IEnumerable<string>> timerService,
-            IRenameFileService renameFileService
+            IRenameFileService renameFileService,
+            ILogger<AppRunner> logger
         )
         {
             _timerService = timerService;
             _renameFileService = renameFileService;
+            _logger = logger;
         }
 
         public void Run()
         {
-            var pathToFolder = GetPathToFolder();
-            var searchMask = "*.mp3";
+            _logger.LogDebug("Application is started.");
 
-            var mp3Files = Directory.GetFiles(pathToFolder, searchMask, SearchOption.AllDirectories);
+            try
+            {
+                var pathToFolder = GetPathToFolder();
+                var searchMask = "*.mp3";
 
-            var foreachStrategy = new ForeachStrategy(_renameFileService);
-            _timerService.MeasureExecutionTime(foreachStrategy.RenameFiles, mp3Files);
+                var mp3Files = Directory.GetFiles(pathToFolder, searchMask, SearchOption.AllDirectories);
 
-            var parallelForeachStrategy = new ParallelForeachStrategy(_renameFileService);
-            _timerService.MeasureExecutionTime(parallelForeachStrategy.RenameFiles, mp3Files);
+                var foreachStrategy = new ForeachStrategy(_renameFileService);
+                _timerService.MeasureExecutionTime(foreachStrategy.RenameFiles, mp3Files);
 
-            var tasksStrategy = new TasksStrategy(_renameFileService);
-            _timerService.MeasureExecutionTime(tasksStrategy.RenameFiles, mp3Files);
+                var parallelForeachStrategy = new ParallelForeachStrategy(_renameFileService);
+                _timerService.MeasureExecutionTime(parallelForeachStrategy.RenameFiles, mp3Files);
+
+                var tasksStrategy = new TasksStrategy(_renameFileService);
+                _timerService.MeasureExecutionTime(tasksStrategy.RenameFiles, mp3Files);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
+            finally
+            {
+                _logger.LogDebug("Application is stopped.");
+            }
         }
 
         private string GetPathToFolder()
