@@ -7,13 +7,21 @@ namespace Mp3Renamer.Extensions
     {
         public static void Rename(this FileInfo fileInfo, string newNameWithoutExtension)
         {
-            if (fileInfo == null)
+            var fileNameWithExtension = $"{ newNameWithoutExtension }{ fileInfo.Extension }";
+
+            if (fileInfo.Name == fileNameWithExtension)
             {
-                throw new ApplicationException("FileInfo cannot be null.");
+                return;
             }
 
-            var fileNameWithExtension = $"{ newNameWithoutExtension }{ fileInfo.Extension }";
-            fileInfo.MoveTo(Path.Combine(fileInfo.Directory?.FullName, fileNameWithExtension));
+            var fullPath = Path.Combine(fileInfo.Directory?.FullName, fileNameWithExtension);
+
+            if (File.Exists(fullPath))
+            {
+                throw new ApplicationException($"File by path { fullPath } already exists.");
+            }
+
+            fileInfo.MoveTo(fullPath);
         }
     }
 }

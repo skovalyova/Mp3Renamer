@@ -23,25 +23,36 @@ namespace Mp3Renamer
 
         public void Run()
         {
+            var pathToFolder = GetPathToFolder();
+            var searchMask = "*.mp3";
+
+            var mp3Files = Directory.GetFiles(pathToFolder, searchMask, SearchOption.AllDirectories);
+
+            var foreachStrategy = new ForeachStrategy(_renameFileService);
+            _timerService.MeasureExecutionTime(foreachStrategy.RenameFiles, mp3Files);
+
+            var parallelForeachStrategy = new ParallelForeachStrategy(_renameFileService);
+            _timerService.MeasureExecutionTime(parallelForeachStrategy.RenameFiles, mp3Files);
+
+            var tasksStrategy = new TasksStrategy(_renameFileService);
+            _timerService.MeasureExecutionTime(tasksStrategy.RenameFiles, mp3Files);
+        }
+
+        private string GetPathToFolder()
+        {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
 
             var configuration = builder.Build();
             var pathToFolder = configuration["pathToFolder"];
-            var searchMask = "*.mp3";
 
-            var foreachStrategy = new ForeachStrategy(_renameFileService);
-            var parallelForeachStrategy = new ParallelForeachStrategy(_renameFileService);
-            var tasksStrategy = new TasksStrategy(_renameFileService);
+            if (String.IsNullOrEmpty(pathToFolder))
+            {
+                throw new ApplicationException("Path to folder is not configured.");
+            }
 
-            var mp3Files = Directory.GetFiles(pathToFolder, searchMask, SearchOption.AllDirectories);
-
-            _timerService.MeasureExecutionTime(foreachStrategy.RenameFiles, mp3Files);
-            _timerService.MeasureExecutionTime(parallelForeachStrategy.RenameFiles, mp3Files);
-            _timerService.MeasureExecutionTime(tasksStrategy.RenameFiles, mp3Files);
-
-            Console.ReadKey();
+            return pathToFolder;
         }
     }
 }

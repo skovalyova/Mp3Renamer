@@ -17,8 +17,8 @@ namespace Mp3Renamer.Strategy
         public void RenameFiles(IEnumerable<string> mp3Files)
         {
             var tasks = mp3Files.Select(file => Task.Run(() => _renameFileService.RenameFile(file)));
-            Task all = Task.WhenAll(tasks.ToArray());
-            all.Wait();
+            Task whenAllTask = Task.WhenAll(tasks.ToArray());
+            whenAllTask.Wait();
         }
     }
 }

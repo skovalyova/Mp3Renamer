@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Mp3Renamer.Interfaces;
 using Mp3Renamer.Services;
@@ -13,7 +14,10 @@ namespace Mp3Renamer
             ConfigureServices(serviceCollection);
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            serviceProvider.GetService<AppRunner>().Run();
+            serviceProvider.GetRequiredService<AppRunner>().Run();
+
+
+            Console.ReadKey();
         }
 
         private static void ConfigureServices(IServiceCollection serviceCollection)
