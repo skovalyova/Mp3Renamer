@@ -1,9 +1,7 @@
-﻿using Mp3Renamer.Services;
-using Mp3Renamer.Strategy;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using Microsoft.Extensions.Configuration;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using Mp3Renamer.Interfaces;
+using Mp3Renamer.Services;
 
 namespace Mp3Renamer
 {
@@ -11,30 +9,19 @@ namespace Mp3Renamer
     {
         private static void Main()
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
 
-            var configuration = builder.Build();
-            var pathToFolder = configuration["pathToFolder"];
-            var searchMask = "*.mp3";
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            serviceProvider.GetService<AppRunner>().Run();
+        }
 
-            var renameFileService = new RenameFileService();
-            var timerService = new TimerService<IEnumerable<string>>();
+        private static void ConfigureServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<ITimerService<IEnumerable<string>>, TimerService<IEnumerable<string>>>();
+            serviceCollection.AddTransient<IRenameFileService, RenameFileService>();
 
-            var foreachStrategy = new ForeachStrategy(renameFileService);
-            var parallelForeachStrategy = new ParallelForeachStrategy(renameFileService);
-            var tasksStrategy = new TasksStrategy(renameFileService);
-
-            var mp3Files = Directory.GetFiles(pathToFolder, searchMask, SearchOption.AllDirectories);
-
-            timerService.MeasureExecutionTime(foreachStrategy.RenameFiles, mp3Files);
-
-            timerService.MeasureExecutionTime(parallelForeachStrategy.RenameFiles, mp3Files);
-
-            timerService.MeasureExecutionTime(tasksStrategy.RenameFiles, mp3Files);
-
-            Console.ReadKey();
+            serviceCollection.AddTransient<AppRunner>();
         }
     }
 }

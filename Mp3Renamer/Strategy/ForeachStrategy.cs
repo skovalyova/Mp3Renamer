@@ -1,14 +1,13 @@
-﻿using Mp3Renamer.Services;
-using Mp3Renamer.Strategy.Interfaces;
+﻿using Mp3Renamer.Interfaces;
 using System.Collections.Generic;
 
 namespace Mp3Renamer.Strategy
 {
     public class ForeachStrategy : IStrategy
     {
-        private readonly RenameFileService _renameFileService;
+        private readonly IRenameFileService _renameFileService;
 
-        public ForeachStrategy(RenameFileService renameFileService)
+        public ForeachStrategy(IRenameFileService renameFileService)
         {
             _renameFileService = renameFileService;
         }

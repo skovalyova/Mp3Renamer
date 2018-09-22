@@ -1,5 +1,4 @@
-﻿using Mp3Renamer.Services;
-using Mp3Renamer.Strategy.Interfaces;
+﻿using Mp3Renamer.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,9 +6,9 @@ namespace Mp3Renamer.Strategy
 {
     public class ParallelForeachStrategy : IStrategy
     {
-        private readonly RenameFileService _renameFileService;
+        private readonly IRenameFileService _renameFileService;
 
-        public ParallelForeachStrategy(RenameFileService renameFileService)
+        public ParallelForeachStrategy(IRenameFileService renameFileService)
         {
             _renameFileService = renameFileService;
         }

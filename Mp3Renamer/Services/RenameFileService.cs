@@ -1,10 +1,11 @@
 ﻿using Mp3Renamer.Extensions;
 using System;
 using System.IO;
+using Mp3Renamer.Interfaces;
 
 namespace Mp3Renamer.Services
 {
-    public class RenameFileService
+    public class RenameFileService : IRenameFileService
     {
         public void RenameFile(string file)
         {

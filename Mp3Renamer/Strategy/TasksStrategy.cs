@@ -1,16 +1,15 @@
-﻿using Mp3Renamer.Strategy.Interfaces;
+﻿using Mp3Renamer.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Mp3Renamer.Services;
 
 namespace Mp3Renamer.Strategy
 {
     public class TasksStrategy : IStrategy
     {
-        private readonly RenameFileService _renameFileService;
+        private readonly IRenameFileService _renameFileService;
 
-        public TasksStrategy(RenameFileService renameFileService)
+        public TasksStrategy(IRenameFileService renameFileService)
         {
             _renameFileService = renameFileService;
         }

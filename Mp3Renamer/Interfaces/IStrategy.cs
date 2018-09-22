@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Mp3Renamer.Strategy.Interfaces
+namespace Mp3Renamer.Interfaces
 {
     public interface IStrategy
     {
